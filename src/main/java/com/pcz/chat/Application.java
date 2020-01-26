@@ -7,7 +7,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 /**
  * @author picongzhi
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.pcz"})
 @MapperScan(basePackages = "com.pcz.chat.mapper")
 public class Application {
     public static void main(String[] args) {
