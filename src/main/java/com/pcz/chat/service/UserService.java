@@ -30,4 +30,12 @@ public interface UserService {
      * @return Users
      */
     Users register(Users user);
+
+    /**
+     * 更新用户
+     *
+     * @param user Users
+     * @return Users
+     */
+    Users updateUserInfo(Users user);
 }

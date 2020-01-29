@@ -3,6 +3,9 @@ package com.pcz.chat.pojo;
 import javax.persistence.Column;
 import javax.persistence.Id;
 
+/**
+ * @author picongzhi
+ */
 public class Users {
     @Id
     private String id;

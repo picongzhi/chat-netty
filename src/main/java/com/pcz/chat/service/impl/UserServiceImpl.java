@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
         return usersMapper.selectOneByExample(example);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Users register(Users user) {
         String id = sid.nextShort();
@@ -52,5 +53,17 @@ public class UserServiceImpl implements UserService {
         usersMapper.insert(user);
 
         return user;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUserInfo(Users user) {
+        usersMapper.updateByPrimaryKeySelective(user);
+
+        return queryUserById(user.getId());
+    }
+
+    private Users queryUserById(String id) {
+        return usersMapper.selectByPrimaryKey(id);
     }
 }
