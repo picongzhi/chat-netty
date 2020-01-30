@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class UserBo {
     private String userId;
+    private String nickname;
     private String faceData;
 }

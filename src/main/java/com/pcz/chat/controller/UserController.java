@@ -66,8 +66,28 @@ public class UserController {
         users.setId(userBo.getUserId());
         users.setFaceImageBig(path);
         users.setFaceImage(thumbImageUrl);
-        userService.updateUserInfo(users);
 
-        return Result.ok(users);
+        Users result = userService.updateUserInfo(users);
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(result, userVo);
+
+        return Result.ok(userVo);
+    }
+
+    @PostMapping("/setNickname")
+    public Result setNickname(@RequestBody UserBo userBo) {
+        if (StringUtils.isBlank(userBo.getNickname()) || StringUtils.isBlank(userBo.getNickname())) {
+            return Result.errorMessage("昵称不能为空");
+        }
+
+        Users users = new Users();
+        users.setId(userBo.getUserId());
+        users.setNickname(userBo.getNickname());
+
+        Users result = userService.updateUserInfo(users);
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(result, userVo);
+
+        return Result.ok(userVo);
     }
 }
