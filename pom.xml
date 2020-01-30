@@ -101,5 +101,12 @@
             <artifactId>fastdfs-client</artifactId>
             <version>1.26.2</version>
         </dependency>
+
+        <!-- 二维码 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.3.3</version>
+        </dependency>
     </dependencies>
 </project>

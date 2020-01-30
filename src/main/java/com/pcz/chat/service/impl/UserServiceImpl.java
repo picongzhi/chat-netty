@@ -3,20 +3,30 @@ package com.pcz.chat.service.impl;
 import com.pcz.chat.mapper.UsersMapper;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
+import com.pcz.chat.utils.FastDFSClient;
+import com.pcz.chat.utils.FileUtil;
 import com.pcz.chat.utils.MD5Util;
+import com.pcz.chat.utils.QRCodeUtil;
 import com.pcz.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
+
+import java.io.IOException;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UsersMapper usersMapper;
+
     @Autowired
     private Sid sid;
+
+    @Autowired
+    private FastDFSClient fastDFSClient;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -48,7 +58,18 @@ public class UserServiceImpl implements UserService {
         user.setFaceImage("");
         user.setFaceImageBig("");
         user.setPassword(MD5Util.getMD5String(user.getPassword()));
-        user.setQrcode("");
+
+        String qrCodeFilePath = "/Users/picongzhi/chat/user/" + user.getId() + "_qrcode.png";
+        QRCodeUtil.createQRCode(qrCodeFilePath, "chat_qrcode:" + user.getId());
+        MultipartFile multipartFile = FileUtil.fileToMultipart(qrCodeFilePath);
+
+        String qrCodePath = "";
+        try {
+            qrCodePath = fastDFSClient.uploadQRCode(multipartFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        user.setQrcode(qrCodePath);
 
         usersMapper.insert(user);
 
