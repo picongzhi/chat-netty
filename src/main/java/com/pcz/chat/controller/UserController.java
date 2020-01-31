@@ -106,4 +106,20 @@ public class UserController {
 
         return Result.errorMessage(status.getMessage());
     }
+
+    @PostMapping("/addFriendRequest")
+    public Result addFriendRequest(String myUserId, String friendUsername) {
+        if (StringUtils.isBlank(myUserId) || StringUtils.isBlank(friendUsername)) {
+            return Result.errorMessage("参数不能为空");
+        }
+
+        SearchFriendsStatusEnum status = userService.searchFriendsPrecondition(myUserId, friendUsername);
+        if (!status.equals(SearchFriendsStatusEnum.SUCCESS)) {
+            return Result.errorMessage(status.getMessage());
+        }
+
+        userService.addFriendRequest(myUserId, friendUsername);
+
+        return Result.ok();
+    }
 }

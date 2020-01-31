@@ -44,7 +44,7 @@ public interface UserService {
      * 搜索朋友前置条件
      *
      * @param myUserId       自己的用户id
-     * @param friendUsername 朋友用户名
+     * @param friendUsername 好友用户名
      * @return SearchFriendsStatusEnum
      */
     SearchFriendsStatusEnum searchFriendsPrecondition(String myUserId, String friendUsername);
@@ -56,4 +56,12 @@ public interface UserService {
      * @return Users
      */
     Users queryUserByUsername(String username);
+
+    /**
+     * 发送好友请求
+     *
+     * @param myUserId       自己的用户id
+     * @param friendUsername 好友用户名
+     */
+    void addFriendRequest(String myUserId, String friendUsername);
 }

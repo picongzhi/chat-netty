@@ -1,8 +1,10 @@
 package com.pcz.chat.service.impl;
 
 import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.mapper.FriendsRequestMapper;
 import com.pcz.chat.mapper.MyFriendsMapper;
 import com.pcz.chat.mapper.UsersMapper;
+import com.pcz.chat.pojo.FriendsRequest;
 import com.pcz.chat.pojo.MyFriends;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private MyFriendsMapper myFriendsMapper;
+
+    @Autowired
+    private FriendsRequestMapper friendsRequestMapper;
 
     @Autowired
     private Sid sid;
@@ -124,5 +130,28 @@ public class UserServiceImpl implements UserService {
         example.createCriteria().andEqualTo("username", username);
 
         return usersMapper.selectOneByExample(example);
+    }
+
+    @Override
+    public void addFriendRequest(String myUserId, String friendUsername) {
+        Users user = queryUserByUsername(friendUsername);
+
+        Example example = new Example(FriendsRequest.class);
+        example.createCriteria()
+                .andEqualTo("sendUserId", myUserId)
+                .andEqualTo("acceptUserId", user.getId());
+        FriendsRequest friendsRequest = friendsRequestMapper.selectOneByExample(example);
+        if (friendsRequest != null) {
+            return;
+        }
+
+        String id = sid.nextShort();
+        friendsRequest = new FriendsRequest();
+        friendsRequest.setId(id);
+        friendsRequest.setSendUserId(myUserId);
+        friendsRequest.setAcceptUserId(user.getId());
+        friendsRequest.setRequestDateTime(new Date());
+
+        friendsRequestMapper.insert(friendsRequest);
     }
 }
