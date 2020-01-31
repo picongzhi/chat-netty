@@ -2,6 +2,7 @@ package com.pcz.chat.controller;
 
 import com.pcz.chat.bo.UserBo;
 import com.pcz.chat.common.Result;
+import com.pcz.chat.enums.SearchFriendsStatusEnum;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
@@ -10,10 +11,7 @@ import com.pcz.chat.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -89,5 +87,23 @@ public class UserController {
         BeanUtils.copyProperties(result, userVo);
 
         return Result.ok(userVo);
+    }
+
+    @GetMapping("/search")
+    public Result searchUser(String myUserId, String friendUsername) {
+        if (StringUtils.isBlank(myUserId) || StringUtils.isBlank(friendUsername)) {
+            return Result.errorMessage("参数不能为空");
+        }
+
+        SearchFriendsStatusEnum status = userService.searchFriendsPrecondition(myUserId, friendUsername);
+        if (status.equals(SearchFriendsStatusEnum.SUCCESS)) {
+            Users user = userService.queryUserByUsername(friendUsername);
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(user, userVo);
+
+            return Result.ok(userVo);
+        }
+
+        return Result.errorMessage(status.getMessage());
     }
 }

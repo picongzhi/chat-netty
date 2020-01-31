@@ -1,6 +1,9 @@
 package com.pcz.chat.service.impl;
 
+import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.mapper.MyFriendsMapper;
 import com.pcz.chat.mapper.UsersMapper;
+import com.pcz.chat.pojo.MyFriends;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
@@ -21,6 +24,9 @@ import java.io.IOException;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UsersMapper usersMapper;
+
+    @Autowired
+    private MyFriendsMapper myFriendsMapper;
 
     @Autowired
     private Sid sid;
@@ -86,5 +92,37 @@ public class UserServiceImpl implements UserService {
 
     private Users queryUserById(String id) {
         return usersMapper.selectByPrimaryKey(id);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public SearchFriendsStatusEnum searchFriendsPrecondition(String myUserId, String friendUsername) {
+        Users user = queryUserByUsername(friendUsername);
+        if (user == null) {
+            return SearchFriendsStatusEnum.USER_NOT_EXIST;
+        }
+
+        if (user.getId().equals(myUserId)) {
+            return SearchFriendsStatusEnum.NOT_YOURSELF;
+        }
+
+        Example myFriendsExample = new Example(MyFriends.class);
+        myFriendsExample.createCriteria()
+                .andEqualTo("myUserId", myUserId)
+                .andEqualTo("myFriendUserId", user.getId());
+        MyFriends myFriend = myFriendsMapper.selectOneByExample(myFriendsExample);
+        if (myFriend != null) {
+            return SearchFriendsStatusEnum.ALREADY_FRIENDS;
+        }
+
+        return SearchFriendsStatusEnum.SUCCESS;
+    }
+
+    @Override
+    public Users queryUserByUsername(String username) {
+        Example example = new Example(Users.class);
+        example.createCriteria().andEqualTo("username", username);
+
+        return usersMapper.selectOneByExample(example);
     }
 }

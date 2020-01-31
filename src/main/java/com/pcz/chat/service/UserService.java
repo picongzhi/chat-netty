@@ -1,5 +1,6 @@
 package com.pcz.chat.service;
 
+import com.pcz.chat.enums.SearchFriendsStatusEnum;
 import com.pcz.chat.pojo.Users;
 
 /**
@@ -38,4 +39,21 @@ public interface UserService {
      * @return Users
      */
     Users updateUserInfo(Users user);
+
+    /**
+     * 搜索朋友前置条件
+     *
+     * @param myUserId       自己的用户id
+     * @param friendUsername 朋友用户名
+     * @return SearchFriendsStatusEnum
+     */
+    SearchFriendsStatusEnum searchFriendsPrecondition(String myUserId, String friendUsername);
+
+    /**
+     * 根据用户名查找用户
+     *
+     * @param username 用户名
+     * @return Users
+     */
+    Users queryUserByUsername(String username);
 }
