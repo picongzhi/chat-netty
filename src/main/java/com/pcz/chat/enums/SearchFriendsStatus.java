@@ -4,7 +4,7 @@ package com.pcz.chat.enums;
 /**
  * @author picongzhi
  */
-public enum SearchFriendsStatusEnum {
+public enum SearchFriendsStatus {
     /**
      * 正常
      */
@@ -25,7 +25,7 @@ public enum SearchFriendsStatusEnum {
     private Integer status;
     private String message;
 
-    SearchFriendsStatusEnum(Integer status, String message) {
+    SearchFriendsStatus(Integer status, String message) {
         this.status = status;
         this.message = message;
     }

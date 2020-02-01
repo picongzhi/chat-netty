@@ -1,7 +1,8 @@
 package com.pcz.chat.service;
 
-import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.enums.SearchFriendsStatus;
 import com.pcz.chat.pojo.Users;
+import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.FriendRequestUserVo;
 
 import java.util.List;
@@ -48,9 +49,9 @@ public interface UserService {
      *
      * @param myUserId       自己的用户id
      * @param friendUsername 好友用户名
-     * @return SearchFriendsStatusEnum
+     * @return SearchFriendsStatus
      */
-    SearchFriendsStatusEnum searchFriendsPrecondition(String myUserId, String friendUsername);
+    SearchFriendsStatus searchFriendsPrecondition(String myUserId, String friendUsername);
 
     /**
      * 根据用户名查找用户
@@ -75,4 +76,11 @@ public interface UserService {
      * @return List<FriendRequestUserVo>
      */
     List<FriendRequestUserVo> queryFriendRequests(String acceptUserId);
+
+    /**
+     * 处理好友请求
+     *
+     * @param friendOperationVo FriendOperationVo
+     */
+    void handleFriendRequest(FriendOperationVo friendOperationVo);
 }

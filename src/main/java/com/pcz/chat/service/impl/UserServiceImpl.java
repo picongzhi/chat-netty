@@ -1,6 +1,7 @@
 package com.pcz.chat.service.impl;
 
-import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.enums.FriendRequestOperationType;
+import com.pcz.chat.enums.SearchFriendsStatus;
 import com.pcz.chat.mapper.CustomUsersMapper;
 import com.pcz.chat.mapper.FriendsRequestMapper;
 import com.pcz.chat.mapper.MyFriendsMapper;
@@ -14,6 +15,7 @@ import com.pcz.chat.utils.FastDFSClient;
 import com.pcz.chat.utils.FileUtil;
 import com.pcz.chat.utils.MD5Util;
 import com.pcz.chat.utils.QRCodeUtil;
+import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.FriendRequestUserVo;
 import com.pcz.idworker.Sid;
 import org.springframework.beans.BeanUtils;
@@ -82,7 +84,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(MD5Util.getMD5String(user.getPassword()));
 
         String qrCodeFilePath = "/Users/picongzhi/chat/user/" + user.getId() + "_qrcode.png";
-        QRCodeUtil.createQRCode(qrCodeFilePath, "chat_qrcode:" + user.getId());
+        QRCodeUtil.createQRCode(qrCodeFilePath, "chat_qrcode:" + user.getUsername());
         MultipartFile multipartFile = FileUtil.fileToMultipart(qrCodeFilePath);
 
         String qrCodePath = "";
@@ -112,14 +114,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public SearchFriendsStatusEnum searchFriendsPrecondition(String myUserId, String friendUsername) {
+    public SearchFriendsStatus searchFriendsPrecondition(String myUserId, String friendUsername) {
         Users user = queryUserByUsername(friendUsername);
         if (user == null) {
-            return SearchFriendsStatusEnum.USER_NOT_EXIST;
+            return SearchFriendsStatus.USER_NOT_EXIST;
         }
 
         if (user.getId().equals(myUserId)) {
-            return SearchFriendsStatusEnum.NOT_YOURSELF;
+            return SearchFriendsStatus.NOT_YOURSELF;
         }
 
         Example myFriendsExample = new Example(MyFriends.class);
@@ -128,10 +130,10 @@ public class UserServiceImpl implements UserService {
                 .andEqualTo("myFriendUserId", user.getId());
         MyFriends myFriend = myFriendsMapper.selectOneByExample(myFriendsExample);
         if (myFriend != null) {
-            return SearchFriendsStatusEnum.ALREADY_FRIENDS;
+            return SearchFriendsStatus.ALREADY_FRIENDS;
         }
 
-        return SearchFriendsStatusEnum.SUCCESS;
+        return SearchFriendsStatus.SUCCESS;
     }
 
     @Override
@@ -182,5 +184,32 @@ public class UserServiceImpl implements UserService {
         });
 
         return friendRequestUserVos;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void handleFriendRequest(FriendOperationVo friendOperationVo) {
+        deleteFriendRequest(friendOperationVo.getSendUserId(), friendOperationVo.getAcceptUserId());
+        if (friendOperationVo.getType().equals(FriendRequestOperationType.ACCEPT)) {
+            saveFriend(friendOperationVo.getSendUserId(), friendOperationVo.getAcceptUserId());
+            saveFriend(friendOperationVo.getAcceptUserId(), friendOperationVo.getSendUserId());
+        }
+    }
+
+    private void deleteFriendRequest(String sendUserId, String acceptUserId) {
+        Example example = new Example(FriendsRequest.class);
+        example.createCriteria()
+                .andEqualTo("sendUserId", sendUserId)
+                .andEqualTo("acceptUserId", acceptUserId);
+        friendsRequestMapper.deleteByExample(example);
+    }
+
+    private void saveFriend(String sendUserId, String acceptUserId) {
+        MyFriends myFriends = new MyFriends();
+        myFriends.setId(sid.nextShort());
+        myFriends.setMyUserId(acceptUserId);
+        myFriends.setMyFriendUserId(sendUserId);
+
+        myFriendsMapper.insert(myFriends);
     }
 }

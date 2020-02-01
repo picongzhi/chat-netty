@@ -2,11 +2,12 @@ package com.pcz.chat.controller;
 
 import com.pcz.chat.bo.UserBo;
 import com.pcz.chat.common.Result;
-import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.enums.SearchFriendsStatus;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
 import com.pcz.chat.utils.FileUtil;
+import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -95,8 +96,8 @@ public class UserController {
             return Result.errorMessage("参数不能为空");
         }
 
-        SearchFriendsStatusEnum status = userService.searchFriendsPrecondition(myUserId, friendUsername);
-        if (status.equals(SearchFriendsStatusEnum.SUCCESS)) {
+        SearchFriendsStatus status = userService.searchFriendsPrecondition(myUserId, friendUsername);
+        if (status.equals(SearchFriendsStatus.SUCCESS)) {
             Users user = userService.queryUserByUsername(friendUsername);
             UserVo userVo = new UserVo();
             BeanUtils.copyProperties(user, userVo);
@@ -113,8 +114,8 @@ public class UserController {
             return Result.errorMessage("参数不能为空");
         }
 
-        SearchFriendsStatusEnum status = userService.searchFriendsPrecondition(myUserId, friendUsername);
-        if (!status.equals(SearchFriendsStatusEnum.SUCCESS)) {
+        SearchFriendsStatus status = userService.searchFriendsPrecondition(myUserId, friendUsername);
+        if (!status.equals(SearchFriendsStatus.SUCCESS)) {
             return Result.errorMessage(status.getMessage());
         }
 
@@ -130,5 +131,18 @@ public class UserController {
         }
 
         return Result.ok(userService.queryFriendRequests(userId));
+    }
+
+    @PostMapping("/handleFriendRequest")
+    public Result handleFriendRequest(@RequestBody FriendOperationVo friendOperationVo) {
+        if (StringUtils.isBlank(friendOperationVo.getSendUserId()) ||
+                StringUtils.isBlank(friendOperationVo.getAcceptUserId()) ||
+                friendOperationVo.getType() == null) {
+            return Result.errorMessage("参数不能为空");
+        }
+
+        userService.handleFriendRequest(friendOperationVo);
+
+        return Result.ok();
     }
 }
