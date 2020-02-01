@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pcz.chat.mapper.CustomUsersMapper">
+    <select id="queryFriendRequestList"
+            resultType="com.pcz.chat.pojo.FriendRequestUser"
+            parameterType="String">
+        SELECT sender.id         AS sendUserId,
+               sender.username   AS sendUsername,
+               sender.nickname   AS sendNickname,
+               sender.face_image AS sendFaceImage
+        FROM `friends_request` request
+                 LEFT JOIN
+             `users` sender
+             ON
+                 request.send_user_id = sender.id
+        WHERE request.accept_user_id = #{acceptUserId}
+    </select>
+</mapper>

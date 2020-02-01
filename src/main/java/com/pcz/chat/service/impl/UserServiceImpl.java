@@ -1,9 +1,11 @@
 package com.pcz.chat.service.impl;
 
 import com.pcz.chat.enums.SearchFriendsStatusEnum;
+import com.pcz.chat.mapper.CustomUsersMapper;
 import com.pcz.chat.mapper.FriendsRequestMapper;
 import com.pcz.chat.mapper.MyFriendsMapper;
 import com.pcz.chat.mapper.UsersMapper;
+import com.pcz.chat.pojo.FriendRequestUser;
 import com.pcz.chat.pojo.FriendsRequest;
 import com.pcz.chat.pojo.MyFriends;
 import com.pcz.chat.pojo.Users;
@@ -12,21 +14,29 @@ import com.pcz.chat.utils.FastDFSClient;
 import com.pcz.chat.utils.FileUtil;
 import com.pcz.chat.utils.MD5Util;
 import com.pcz.chat.utils.QRCodeUtil;
+import com.pcz.chat.vo.FriendRequestUserVo;
 import com.pcz.idworker.Sid;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UsersMapper usersMapper;
+
+    @Autowired
+    private CustomUsersMapper customUsersMapper;
 
     @Autowired
     private MyFriendsMapper myFriendsMapper;
@@ -132,6 +142,7 @@ public class UserServiceImpl implements UserService {
         return usersMapper.selectOneByExample(example);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void addFriendRequest(String myUserId, String friendUsername) {
         Users user = queryUserByUsername(friendUsername);
@@ -153,5 +164,23 @@ public class UserServiceImpl implements UserService {
         friendsRequest.setRequestDateTime(new Date());
 
         friendsRequestMapper.insert(friendsRequest);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<FriendRequestUserVo> queryFriendRequests(String acceptUserId) {
+        List<FriendRequestUser> friendRequestUsers = customUsersMapper.queryFriendRequestList(acceptUserId);
+        if (CollectionUtils.isEmpty(friendRequestUsers)) {
+            return null;
+        }
+
+        List<FriendRequestUserVo> friendRequestUserVos = new ArrayList<>();
+        friendRequestUsers.forEach(friendRequestUser -> {
+            FriendRequestUserVo friendRequestUserVo = new FriendRequestUserVo();
+            BeanUtils.copyProperties(friendRequestUser, friendRequestUserVo);
+            friendRequestUserVos.add(friendRequestUserVo);
+        });
+
+        return friendRequestUserVos;
     }
 }

@@ -2,6 +2,9 @@ package com.pcz.chat.service;
 
 import com.pcz.chat.enums.SearchFriendsStatusEnum;
 import com.pcz.chat.pojo.Users;
+import com.pcz.chat.vo.FriendRequestUserVo;
+
+import java.util.List;
 
 /**
  * @author picongzhi
@@ -64,4 +67,12 @@ public interface UserService {
      * @param friendUsername 好友用户名
      */
     void addFriendRequest(String myUserId, String friendUsername);
+
+    /**
+     * 获取接收用户的好友请求
+     *
+     * @param acceptUserId 接收用户id
+     * @return List<FriendRequestUserVo>
+     */
+    List<FriendRequestUserVo> queryFriendRequests(String acceptUserId);
 }

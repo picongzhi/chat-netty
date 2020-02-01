@@ -122,4 +122,13 @@ public class UserController {
 
         return Result.ok();
     }
+
+    @GetMapping("/queryFriendRequests")
+    public Result queryFriendRequests(String userId) {
+        if (StringUtils.isBlank(userId)) {
+            return Result.errorMessage("参数不能为空");
+        }
+
+        return Result.ok(userService.queryFriendRequests(userId));
+    }
 }
