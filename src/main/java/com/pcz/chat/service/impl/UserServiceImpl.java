@@ -6,15 +6,13 @@ import com.pcz.chat.mapper.CustomUsersMapper;
 import com.pcz.chat.mapper.FriendsRequestMapper;
 import com.pcz.chat.mapper.MyFriendsMapper;
 import com.pcz.chat.mapper.UsersMapper;
-import com.pcz.chat.pojo.FriendRequestUser;
-import com.pcz.chat.pojo.FriendsRequest;
-import com.pcz.chat.pojo.MyFriends;
-import com.pcz.chat.pojo.Users;
+import com.pcz.chat.pojo.*;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
 import com.pcz.chat.utils.FileUtil;
 import com.pcz.chat.utils.MD5Util;
 import com.pcz.chat.utils.QRCodeUtil;
+import com.pcz.chat.vo.FriendInfoVo;
 import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.FriendRequestUserVo;
 import com.pcz.idworker.Sid;
@@ -211,5 +209,22 @@ public class UserServiceImpl implements UserService {
         myFriends.setMyFriendUserId(sendUserId);
 
         myFriendsMapper.insert(myFriends);
+    }
+
+    @Override
+    public List<FriendInfoVo> getFriends(String userId) {
+        List<FriendInfo> friendInfos = customUsersMapper.queryFriends(userId);
+        if (CollectionUtils.isEmpty(friendInfos)) {
+            return null;
+        }
+
+        List<FriendInfoVo> friendInfoVos = new ArrayList<>();
+        friendInfos.forEach(friendInfo -> {
+            FriendInfoVo friendInfoVo = new FriendInfoVo();
+            BeanUtils.copyProperties(friendInfo, friendInfoVo);
+            friendInfoVos.add(friendInfoVo);
+        });
+
+        return friendInfoVos;
     }
 }

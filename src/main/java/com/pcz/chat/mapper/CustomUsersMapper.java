@@ -1,5 +1,6 @@
 package com.pcz.chat.mapper;
 
+import com.pcz.chat.pojo.FriendInfo;
 import com.pcz.chat.pojo.FriendRequestUser;
 
 import java.util.List;
@@ -15,4 +16,12 @@ public interface CustomUsersMapper {
      * @return List<FriendsRequest>
      */
     List<FriendRequestUser> queryFriendRequestList(String acceptUserId);
+
+    /**
+     * 查询好友
+     *
+     * @param userId 用户id
+     * @return List<FriendInfo>
+     */
+    List<FriendInfo> queryFriends(String userId);
 }

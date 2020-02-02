@@ -15,4 +15,19 @@
                  request.send_user_id = sender.id
         WHERE request.accept_user_id = #{acceptUserId}
     </select>
+
+    <select id="queryFriends"
+            resultType="com.pcz.chat.pojo.FriendInfo"
+            parameterType="String">
+        SELECT u.id         AS friendUserId,
+               u.username   AS friendUsername,
+               u.face_image AS friendFaceImage,
+               u.nickname   AS friendNickname
+        FROM `my_friends` mf
+                 LEFT JOIN
+             `users` u
+             ON
+                 u.id = mf.my_friend_user_id
+        WHERE mf.my_user_id = #{userId}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.pcz.chat.service;
 
 import com.pcz.chat.enums.SearchFriendsStatus;
 import com.pcz.chat.pojo.Users;
+import com.pcz.chat.vo.FriendInfoVo;
 import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.FriendRequestUserVo;
 
@@ -83,4 +84,12 @@ public interface UserService {
      * @param friendOperationVo FriendOperationVo
      */
     void handleFriendRequest(FriendOperationVo friendOperationVo);
+
+    /**
+     * 根据userId获取好友
+     *
+     * @param userId 用户id
+     * @return List<FriendInfoVo>
+     */
+    List<FriendInfoVo> getFriends(String userId);
 }

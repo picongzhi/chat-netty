@@ -7,6 +7,7 @@ import com.pcz.chat.pojo.Users;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
 import com.pcz.chat.utils.FileUtil;
+import com.pcz.chat.vo.FriendInfoVo;
 import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author picongzhi
@@ -142,7 +145,17 @@ public class UserController {
         }
 
         userService.handleFriendRequest(friendOperationVo);
+        List<FriendInfoVo> friendInfoVos = userService.getFriends(friendOperationVo.getAcceptUserId());
 
-        return Result.ok();
+        return Result.ok(friendInfoVos);
+    }
+
+    @GetMapping("/myFriends")
+    public Result getMyFriends(String userId) {
+        if (StringUtils.isBlank(userId)) {
+            return Result.errorMessage("参数不能为空");
+        }
+
+        return Result.ok(userService.getFriends(userId));
     }
 }
