@@ -30,4 +30,13 @@
                  u.id = mf.my_friend_user_id
         WHERE mf.my_user_id = #{userId}
     </select>
+
+    <update id="batchUpdateMessageSigned">
+        UPDATE chat_msg
+        SET sign_flag = 1
+        WHERE id IN
+        <foreach collection="list" item="id" index="index" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

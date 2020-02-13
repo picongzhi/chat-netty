@@ -1,11 +1,10 @@
 package com.pcz.chat.service.impl;
 
 import com.pcz.chat.enums.FriendRequestOperationType;
+import com.pcz.chat.enums.MessageSignFlag;
 import com.pcz.chat.enums.SearchFriendsStatus;
-import com.pcz.chat.mapper.CustomUsersMapper;
-import com.pcz.chat.mapper.FriendsRequestMapper;
-import com.pcz.chat.mapper.MyFriendsMapper;
-import com.pcz.chat.mapper.UsersMapper;
+import com.pcz.chat.mapper.*;
+import com.pcz.chat.netty.ChatMessage;
 import com.pcz.chat.pojo.*;
 import com.pcz.chat.service.UserService;
 import com.pcz.chat.utils.FastDFSClient;
@@ -43,6 +42,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FriendsRequestMapper friendsRequestMapper;
+
+    @Autowired
+    private ChatMsgMapper chatMsgMapper;
 
     @Autowired
     private Sid sid;
@@ -226,5 +228,29 @@ public class UserServiceImpl implements UserService {
         });
 
         return friendInfoVos;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public String saveMessage(ChatMessage chatMessage) {
+        String id = sid.nextShort();
+
+        ChatMsg chatMsg = new ChatMsg();
+        chatMsg.setId(id);
+        chatMsg.setAcceptUserId(chatMessage.getReceiverId());
+        chatMsg.setSendUserId(chatMessage.getSenderId());
+        chatMsg.setCreateTime(new Date());
+        chatMsg.setSignFlag(MessageSignFlag.UNSIGNED.type);
+        chatMsg.setMsg(chatMessage.getMsg());
+
+        chatMsgMapper.insert(chatMsg);
+
+        return id;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateMessageSigned(List<String> msgIdList) {
+        customUsersMapper.batchUpdateMessageSigned(msgIdList);
     }
 }

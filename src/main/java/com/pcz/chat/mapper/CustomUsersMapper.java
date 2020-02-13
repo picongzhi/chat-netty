@@ -24,4 +24,11 @@ public interface CustomUsersMapper {
      * @return List<FriendInfo>
      */
     List<FriendInfo> queryFriends(String userId);
+
+    /**
+     * 批量将消息的状态置为已签收
+     *
+     * @param msgIdList 消息列表
+     */
+    void batchUpdateMessageSigned(List<String> msgIdList);
 }

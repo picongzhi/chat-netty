@@ -1,6 +1,7 @@
 package com.pcz.chat.service;
 
 import com.pcz.chat.enums.SearchFriendsStatus;
+import com.pcz.chat.netty.ChatMessage;
 import com.pcz.chat.pojo.Users;
 import com.pcz.chat.vo.FriendInfoVo;
 import com.pcz.chat.vo.FriendOperationVo;
@@ -92,4 +93,19 @@ public interface UserService {
      * @return List<FriendInfoVo>
      */
     List<FriendInfoVo> getFriends(String userId);
+
+    /**
+     * 保存聊天消息
+     *
+     * @param chatMessage ChatMessage
+     * @return
+     */
+    public String saveMessage(ChatMessage chatMessage);
+
+    /**
+     * 批量更新消息状态至已签收
+     *
+     * @param msgIdList 消息列表
+     */
+    void updateMessageSigned(List<String> msgIdList);
 }
