@@ -1,20 +1,22 @@
 package com.pcz.chat.service.impl;
 
 import com.pcz.chat.enums.FriendRequestOperationType;
+import com.pcz.chat.enums.MessageAction;
 import com.pcz.chat.enums.MessageSignFlag;
 import com.pcz.chat.enums.SearchFriendsStatus;
 import com.pcz.chat.mapper.*;
 import com.pcz.chat.netty.ChatMessage;
+import com.pcz.chat.netty.DataContent;
+import com.pcz.chat.netty.UserChannelManager;
 import com.pcz.chat.pojo.*;
 import com.pcz.chat.service.UserService;
-import com.pcz.chat.utils.FastDFSClient;
-import com.pcz.chat.utils.FileUtil;
-import com.pcz.chat.utils.MD5Util;
-import com.pcz.chat.utils.QRCodeUtil;
+import com.pcz.chat.utils.*;
 import com.pcz.chat.vo.FriendInfoVo;
 import com.pcz.chat.vo.FriendOperationVo;
 import com.pcz.chat.vo.FriendRequestUserVo;
 import com.pcz.idworker.Sid;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -193,6 +195,14 @@ public class UserServiceImpl implements UserService {
         if (friendOperationVo.getType().equals(FriendRequestOperationType.ACCEPT)) {
             saveFriend(friendOperationVo.getSendUserId(), friendOperationVo.getAcceptUserId());
             saveFriend(friendOperationVo.getAcceptUserId(), friendOperationVo.getSendUserId());
+        }
+
+        Channel channel = UserChannelManager.get(friendOperationVo.getSendUserId());
+        if (channel != null) {
+            DataContent dataContent = new DataContent();
+            dataContent.setAction(MessageAction.PULL_FRIEND.type);
+
+            channel.writeAndFlush(new TextWebSocketFrame(JsonUtil.objectToJson(dataContent)));
         }
     }
 

@@ -20,7 +20,11 @@ public enum MessageAction {
     /**
      * 客户端保持心跳
      */
-    KEEPALIVE(4, "客户端保持心跳");
+    KEEPALIVE(4, "客户端保持心跳"),
+    /**
+     * 拉取好友
+     */
+    PULL_FRIEND(5, "拉取好友");
 
     public final Integer type;
     public final String content;

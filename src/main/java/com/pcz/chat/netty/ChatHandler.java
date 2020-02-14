@@ -63,7 +63,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                 // 消息推送
             } else {
                 if (userChannelGroups.find(receiverChannel.id()) != null) {
-                    receiverChannel.writeAndFlush(new TextWebSocketFrame(JsonUtil.objectToJson(chatMessage)));
+                    receiverChannel.writeAndFlush(new TextWebSocketFrame(JsonUtil.objectToJson(dataContent)));
                 } else {
                     // 消息推送
                 }
